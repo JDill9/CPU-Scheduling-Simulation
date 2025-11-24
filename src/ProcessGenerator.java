@@ -13,8 +13,8 @@ public class ProcessGenerator {
         for (int i = 1; i <= n; i++) {
             String pid = "P" + i;
 
-            int arrival = rand.nextInt(10);    
-            int burst = rand.nextInt(8) + 3;   
+            int arrival = rand.nextInt(10);     
+            int burst = rand.nextInt(8) + 3;    
             int priority = rand.nextInt(5) + 1; 
 
             boolean hasIO = rand.nextBoolean();
