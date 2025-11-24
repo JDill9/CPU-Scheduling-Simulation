@@ -3,15 +3,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Utility methods for the CPU scheduling simulation:
- *  - deep-copy processes for each algorithm
- *  - print summary tables and averages
+ * Utility methods for the CPU scheduling simulation.
  */
 public class SimulationUtils {
 
-    /**
-     * Create a deep copy list of processes with reset dynamic state.
-     */
+    /** Deep copy list of processes */
     public static List<Process> deepCopyProcesses(List<Process> original) {
         List<Process> copy = new ArrayList<>();
         for (Process p : original) {
@@ -20,10 +16,7 @@ public class SimulationUtils {
         return copy;
     }
 
-    /**
-     * Print a summary table for the given algorithm and its processes.
-     * Waiting time is taken as total time in the ready queue.
-     */
+    /** Print summary table */
     public static void printSummary(String algorithmName, List<Process> processes) {
         System.out.println("=== Results for " + algorithmName + " ===");
 
@@ -33,26 +26,17 @@ public class SimulationUtils {
                 "%-5s %-7d %-7d %-8d %-9d %-10d %-12d %-12d %-12d %-12d%n";
 
         System.out.printf(headerFormat,
-                "PID",
-                "Arrive",
-                "Burst",
-                "Prio",
-                "IOstart",
-                "IOdur",
-                "Complete",
-                "Turnaround",
-                "Wait(ready)",
-                "Wait(IO)");
+                "PID", "Arrive", "Burst", "Prio",
+                "IOstart", "IOdur",
+                "Complete", "Turnaround",
+                "Wait(ready)", "Wait(IO)");
 
-        double totalTurnaround = 0.0;
-        double totalWaiting = 0.0;
+        double totalTurnaround = 0;
+        double totalWaiting = 0;
 
         for (Process p : processes) {
-            int waitingTime = p.readyQueueWaitingTime;
-            int turnaround = p.turnaroundTime;
-
-            totalTurnaround += turnaround;
-            totalWaiting += waitingTime;
+            totalTurnaround += p.turnaroundTime;
+            totalWaiting += p.readyQueueWaitingTime;
 
             System.out.printf(rowFormat,
                     p.pid,
@@ -62,17 +46,15 @@ public class SimulationUtils {
                     p.ioStartTime,
                     p.ioDuration,
                     p.completionTime,
-                    turnaround,
-                    waitingTime,
+                    p.turnaroundTime,
+                    p.readyQueueWaitingTime,
                     p.ioWaitingTime);
         }
 
         int n = processes.size();
         if (n > 0) {
-            double avgT = totalTurnaround / n;
-            double avgW = totalWaiting / n;
-            System.out.printf("%nAverage Turnaround Time: %.2f%n", avgT);
-            System.out.printf("Average Waiting Time (ready queue): %.2f%n", avgW);
+            System.out.printf("%nAverage Turnaround Time: %.2f%n", totalTurnaround / n);
+            System.out.printf("Average Waiting Time (ready queue): %.2f%n", totalWaiting / n);
         }
 
         System.out.println();
