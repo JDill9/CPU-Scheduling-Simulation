@@ -10,7 +10,7 @@ import java.util.Queue;
 public class CPUSchedulingSimulator {
 
     /* ============================
-       FCFS (already implemented)
+       FCFS
        ============================ */
     public static List<Process> simulateFCFS(List<Process> originalProcesses) {
         List<Process> processes = SimulationUtils.deepCopyProcesses(originalProcesses);
@@ -131,7 +131,7 @@ public class CPUSchedulingSimulator {
             for (Process p : ready) p.readyQueueWaitingTime++;
             for (Process p : ioQueue) p.ioWaitingTime++;
 
-            // CPU pick — SHORTEST remaining time
+            // CPU pick — Shortest remaining time
             if (cpu == null && !ready.isEmpty()) {
                 cpu = ready.stream()
                         .min(Comparator.comparingInt(p -> p.remainingTime))
