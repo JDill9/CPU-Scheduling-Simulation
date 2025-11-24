@@ -8,7 +8,7 @@ import java.util.Objects;
  */
 public class Process {
 
-    // ---- Static attributes (input) ----
+    // ---- Static attributes ----
     public final String pid;
     public final int arrivalTime;
     public final int burstTime;
