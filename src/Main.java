@@ -21,12 +21,12 @@ public class Main {
         List<Process> fcfsResult = CPUSchedulingSimulator.simulateFCFS(processes);
         SimulationUtils.printSummary("FCFS", fcfsResult);
 
-        // --- SJF (ADDED) ---
+        // --- SJF ---
         System.out.println("=== SJF Simulation ===");
         List<Process> sjfResult = CPUSchedulingSimulator.simulateSJF(processes);
         SimulationUtils.printSummary("SJF", sjfResult);
 
-        // --- Priority (ADDED) ---
+        // --- Priority ---
         System.out.println("=== Priority Simulation ===");
         List<Process> prioResult = CPUSchedulingSimulator.simulatePriority(processes);
         SimulationUtils.printSummary("Priority", prioResult);
