@@ -26,16 +26,16 @@ public class Process {
 
     // ---- Dynamic state (per simulation run) ----
     public int remainingTime;
-    public int cpuTimeExecuted;       // total CPU time executed so far
-    public boolean hasDoneIO;         // true once I/O has completed
-    public boolean inIO;              // currently being serviced by I/O
-    public int ioRemainingTime;       // remaining I/O service time
-    public int completionTime = -1;   // wall-clock time when finished
-    public int turnaroundTime;        // completionTime - arrivalTime
-    public int readyQueueWaitingTime; // time spent in ready queue
-    public int ioWaitingTime;         // time spent waiting for I/O device
-    public int firstStartTime = -1;   // time when first got CPU
-    public boolean admittedToSystem;  // has arrived and been enqueued
+    public int cpuTimeExecuted;
+    public boolean hasDoneIO;
+    public boolean inIO;
+    public int ioRemainingTime;
+    public int completionTime = -1;
+    public int turnaroundTime;
+    public int readyQueueWaitingTime;
+    public int ioWaitingTime;
+    public int firstStartTime = -1;
+    public boolean admittedToSystem;
 
     public Process(String pid,
                    int burstTime,
@@ -50,13 +50,12 @@ public class Process {
         this.ioStartTime = ioStartTime;
         this.ioDuration = ioDuration;
 
-        // initialize dynamic state for first run
         resetDynamicState();
     }
 
     /**
-     * Reset all dynamic fields so the same process object
-     * can be reused in another simulation (FCFS, RR, etc.).
+     * Reset all dynamic fields so the same process can be reused
+     * for multiple simulations.
      */
     public void resetDynamicState() {
         this.remainingTime = this.burstTime;
@@ -73,17 +72,15 @@ public class Process {
     }
 
     /**
-     * Create a fresh copy with the same static attributes
-     * but dynamic state reset, so each algorithm can run
-     * with clean process state.
+     * Create a deep simulation copy of this process.
      */
     public Process copyForSimulation() {
         return new Process(this.pid,
-                           this.burstTime,
-                           this.arrivalTime,
-                           this.priority,
-                           this.ioStartTime,
-                           this.ioDuration);
+                this.burstTime,
+                this.arrivalTime,
+                this.priority,
+                this.ioStartTime,
+                this.ioDuration);
     }
 
     @Override
