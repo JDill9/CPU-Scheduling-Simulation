@@ -414,7 +414,6 @@ The choice of scheduling algorithm has profound implications for system performa
 Navigate to the project directory and compile all Java files:
 
 ```bash
-cd "c:\Users\Justin Dill\Documents\College\Towson\2025\Fall-2025\Operating-Systems\Project-1"
 javac src/*.java
 ```
 
@@ -446,7 +445,7 @@ You can also adjust the Round-Robin quantum in the `simulateRoundRobin()` call.
 
 ---
 
-**Author**: [Your Name]
+**Author**: Justin Dill Sam Kleanthous
 **Date**: November 2025
 **Course**: COSC 439 - Operating Systems
 **Institution**: Towson University
