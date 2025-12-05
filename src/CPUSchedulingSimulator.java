@@ -279,97 +279,107 @@ public class CPUSchedulingSimulator {
     }
 
     /* ============================
-       Round Robin
-       ============================ */
-    public static List<Process> simulateRoundRobin(List<Process> original, int quantum) {
-        if (quantum <= 0) throw new IllegalArgumentException("Quantum must be > 0");
+   Round Robin
+   ============================ */
+public static List<Process> simulateRoundRobin(List<Process> original, int quantum) {
+    if (quantum <= 0) throw new IllegalArgumentException("Quantum must be > 0");
 
-        List<Process> processes = SimulationUtils.deepCopyProcesses(original);
+    List<Process> processes = SimulationUtils.deepCopyProcesses(original);
 
-        Queue<Process> ready = new ArrayDeque<>();
-        Queue<Process> ioQueue = new ArrayDeque<>();
+    Queue<Process> ready = new ArrayDeque<>();
 
-        Process cpu = null, io = null;
-        int time = 0, completed = 0;
-        int total = processes.size();
-        int quantumRemaining = 0;
+    Process cpu = null;
+    int time = 0, completed = 0;
+    int total = processes.size();
+    int quantumRemaining = 0;
 
-        while (completed < total) {
+    // initialize IO states
+    for (Process p : processes) p.ioRemainingTime = 0;
 
-            // Arrivals
-            for (Process p : processes) {
-                if (!p.admittedToSystem && p.arrivalTime == time) {
-                    p.admittedToSystem = true;
+    while (completed < total) {
+
+        // Arrivals
+        for (Process p : processes) {
+            if (!p.admittedToSystem && p.arrivalTime == time) {
+                p.admittedToSystem = true;
+                ready.add(p);
+            }
+        }
+
+        // PARALLEL I/O HANDLING
+        for (Process p : processes) {
+            if (p.inIO) {
+                p.ioRemainingTime--;
+                if (p.ioRemainingTime == 0) {
+                    p.inIO = false;
+                    p.hasDoneIO = true;
                     ready.add(p);
                 }
             }
-
-            // IO start
-            if (io == null && !ioQueue.isEmpty()) {
-                io = ioQueue.remove();
-                io.inIO = true;
-            }
-
-            // Waiting
-            for (Process p : ready) p.readyQueueWaitingTime++;
-            for (Process p : ioQueue) p.ioWaitingTime++;
-
-            // CPU pick
-            if (cpu == null && !ready.isEmpty()) {
-                cpu = ready.remove();
-                quantumRemaining = quantum;
-            }
-
-            boolean movedToIO = false;
-
-            // CPU exec
-            if (cpu != null) {
-                if (cpu.firstStartTime == -1)
-                    cpu.firstStartTime = time;
-
-                cpu.remainingTime--;
-                cpu.cpuTimeExecuted++;
-                quantumRemaining--;
-
-                if (!cpu.hasDoneIO &&
-                    cpu.ioStartTime >= 0 &&
-                    cpu.cpuTimeExecuted == cpu.ioStartTime) {
-
-                    cpu.ioRemainingTime = cpu.ioDuration;
-                    cpu.inIO = true;
-                    ioQueue.add(cpu);
-                    cpu = null;
-                    movedToIO = true;
-                }
-            }
-
-            // IO exec
-            if (io != null) {
-                io.ioRemainingTime--;
-                if (io.ioRemainingTime <= 0) {
-                    io.inIO = false;
-                    io.hasDoneIO = true;
-                    ready.add(io);
-                    io = null;
-                }
-            }
-
-            // Completion or preempt
-            if (!movedToIO && cpu != null) {
-                if (cpu.remainingTime <= 0) {
-                    cpu.completionTime = time + 1;
-                    cpu.turnaroundTime = cpu.completionTime - cpu.arrivalTime;
-                    completed++;
-                    cpu = null;
-                } else if (quantumRemaining <= 0) {
-                    ready.add(cpu);
-                    cpu = null;
-                }
-            }
-
-            time++;
         }
 
-        return processes;
+        // Waiting time
+        for (Process p : ready) p.readyQueueWaitingTime++;
+
+        // CPU PICK
+        if (cpu == null) {
+
+            // CPU must idle if nothing is ready
+            if (ready.isEmpty()) {
+                time++;
+                continue;  
+            }
+
+            cpu = ready.remove();
+            quantumRemaining = quantum;
+        }
+
+        boolean movedToIO = false;
+
+        // CPU execution
+        if (cpu != null) {
+            if (cpu.firstStartTime == -1)
+                cpu.firstStartTime = time;
+
+            cpu.remainingTime--;
+            cpu.cpuTimeExecuted++;
+            quantumRemaining--;
+
+            // Move to I/O
+            if (!cpu.hasDoneIO &&
+                cpu.ioStartTime >= 0 &&
+                cpu.cpuTimeExecuted == cpu.ioStartTime) {
+
+                cpu.ioRemainingTime = cpu.ioDuration;
+                cpu.inIO = true;
+                cpu = null;
+                quantumRemaining = 0;
+                movedToIO = true;
+            }
+        }
+
+        // Completion or preempt
+        if (!movedToIO && cpu != null) {
+
+            // completion
+            if (cpu.remainingTime <= 0) {
+                cpu.completionTime = time + 1;
+                cpu.turnaroundTime = cpu.completionTime - cpu.arrivalTime;
+                completed++;
+                cpu = null;
+                quantumRemaining = 0;
+            }
+
+            // quantum expired → preempt
+            else if (quantumRemaining <= 0) {
+                ready.add(cpu);
+                cpu = null;
+            }
+        }
+
+        time++;
     }
+
+    return processes;
+}
 }
