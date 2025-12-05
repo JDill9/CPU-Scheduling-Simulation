@@ -9,12 +9,25 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
 
-        List<Process> processes = new ArrayList<>();
+        System.out.println("MAIN SOURCE ACTIVE");
+        System.out.println(">>> USING RANDOM GENERATOR <<<");
 
+        //List<Process> processes = new ArrayList<>();
         // Example from "Input_for_project#1.pdf":
-        processes.add(new Process("P1", 10, 0, 1, 2, 3));
-        processes.add(new Process("P2",  6, 2, 1, 1, 2));
-        processes.add(new Process("P3",  8, 4, 1, 3, 1));
+        //processes.add(new Process("P1", 10, 0, 1, 2, 3));
+        //processes.add(new Process("P2",  6, 2, 3, 1, 2));
+        //processes.add(new Process("P3",  8, 4, 2, 3, 1));
+
+        // === AUTO-GENERATE ≥20 RANDOM PROCESSES ===
+        List<Process> processes = ProcessGenerator.generateProcesses(20);
+
+        System.out.println("=== GENERATED PROCESSES ===");
+        for (Process p : processes) {
+        System.out.printf("%s  arrival=%d  burst=%d  priority=%d  ioStart=%d  ioDur=%d%n",
+        p.pid, p.arrivalTime, p.burstTime, p.priority, p.ioStartTime, p.ioDuration);
+        }
+        System.out.println();
+       
 
         // --- FCFS ---
         System.out.println("=== FCFS Simulation ===");
